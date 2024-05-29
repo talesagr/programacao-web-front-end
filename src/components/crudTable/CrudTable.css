@@ -1,0 +1,45 @@
+/* src/components/CrudTable.css */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1em;
+    font-family: 'Roboto', sans-serif;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  thead tr {
+    background-color: #003366; /* Azul mais escuro */
+    color: #ffffff;
+    text-align: left;
+  }
+  
+  th, td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+  }
+  
+  tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+  }
+  
+  tbody tr:hover {
+    background-color: #e0e0e0;
+  }
+  
+  button {
+    background-color: #00509E; /* Azul para botões */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    margin: 0 5px;
+  }
+  
+  button:hover {
+    background-color: #003366; /* Azul mais escuro no hover */
+  }
+  

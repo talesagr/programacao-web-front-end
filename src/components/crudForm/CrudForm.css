@@ -1,0 +1,63 @@
+/* src/components/CrudForm.css */
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 500px;
+  margin: 20px auto; /* Centraliza o formulário horizontalmente */
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+form > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+label {
+  font-weight: bold;
+  color: #003366; 
+  align-self: flex-start; 
+}
+
+input[type="text"],
+input[type="checkbox"] {
+  width: 100%;
+  max-width: 480px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1em;
+}
+
+input[type="checkbox"] {
+  width: auto;
+}
+
+button {
+  background-color: #00509E; 
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  margin: 10px 0; 
+  width: 100%;
+}
+
+button:hover {
+  background-color: #003366; 
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
