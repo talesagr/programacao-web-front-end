@@ -1,33 +1,53 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CrudTable from '../components/crudTable/CrudTable';
 import CrudForm from '../components/crudForm/CrudForm';
+import {getUsers, createUser, updateUser, deleteUser} from '../api';
 
-const initialUsers = [
-  { id: 1, nome: 'Usuario A', senha: 'senha123', isAdmin: false },
-  { id: 2, nome: 'Usuario B', senha: 'senha456', isAdmin: true },
-];
 
 const Users = () => {
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
+
+  useEffect(()=>{
+    fetchUsers();
+  }, [])
+
+  const fetchUsers = async () => {
+    try {
+      const response = await getUsers();
+      setUsers(response.data)
+    } catch (error) {
+      console.error('Erro ao buscar usuarios:', error)
+    }
+  }
 
   const handleEdit = (id) => {
     const user = users.find((u) => u.id === id);
     setEditingUser(user);
   };
 
-  const handleDelete = (id) => {
-    setUsers(users.filter((u) => u.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await deleteUser(id);
+      setUsers(users.filter((u)=> u.id !== id));
+    } catch (error) {
+      console.error('Erro ao deletar usuario:', error)
+    }
   };
 
-  const handleSave = (user) => {
-    if (user.id) {
-      setUsers(users.map((u) => (u.id === user.id ? user : u)));
-    } else {
-      user.id = users.length + 1;
-      setUsers([...users, user]);
+  const handleSave = async (user) => {
+    try{
+      if (user.id) {
+        await updateUser(user.id, user);
+        setUsers(users.map((u) => (u.id === user.id ? user : u)));
+      } else {
+        const response = await createUser(user);
+        setUsers([...users, response.data])
+      }
+      setEditingUser(null);
+    }catch (error) {
+      console.error('Erro ao salvar usuario', error)
     }
-    setEditingUser(null);
   };
 
   const handleCancel = () => {

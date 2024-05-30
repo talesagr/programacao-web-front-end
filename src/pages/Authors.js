@@ -1,33 +1,53 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CrudTable from '../components/crudTable/CrudTable';
 import CrudForm from '../components/crudForm/CrudForm';
-
-const initialAuthors = [
-  { id: 1, nome: 'Autor A', biografia: 'Bio A', 'data-nascimento': '2000-01-01', nacionalidade: 'Brasileiro' },
-  { id: 2, nome: 'Autor B', biografia: 'Bio B', 'data-nascimento': '1980-05-15', nacionalidade: 'Americano' },
-];
+import {getAuthors, createAuthor, updateAuthor, deleteAuthor } from '../api'
 
 const Authors = () => {
-  const [authors, setAuthors] = useState(initialAuthors);
+  const [authors, setAuthors] = useState([]);
   const [editingAuthor, setEditingAuthor] = useState(null);
+
+  
+  useEffect(()=>{
+    fetchAuthors();
+  }, [])
+
+  const fetchAuthors = async () => {
+    try {
+      const response = await getAuthors()
+      setAuthors(response.data)
+    } catch (error) {
+      console.error('Erro ao buscar autores:',error)
+    }
+  }
 
   const handleEdit = (id) => {
     const author = authors.find((a) => a.id === id);
     setEditingAuthor(author);
   };
 
-  const handleDelete = (id) => {
-    setAuthors(authors.filter((a) => a.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await deleteAuthor(id)
+      setAuthors(authors.filter((a) => a.id !== id)); 
+    } catch (error) {
+      console.error('Erro ao deletar autor:', error)
+    }
   };
 
-  const handleSave = (author) => {
-    if (author.id) {
-      setAuthors(authors.map((a) => (a.id === author.id ? author : a)));
-    } else {
-      author.id = authors.length + 1;
-      setAuthors([...authors, author]);
+  const handleSave = async (author) => {
+    try {
+      if (author.id) {
+        await updateAuthor(author.id, author)
+        setAuthors(authors.map((a) => (a.id === author.id ? author : a)));
+      } else {
+        const response = await createAuthor(author)
+        setAuthors([...authors, response.data]);
+      }
+      setEditingAuthor(null);
+    } catch (error) {
+      console.error('Erro ao salvar autor:', error)
     }
-    setEditingAuthor(null);
   };
 
   const handleCancel = () => {

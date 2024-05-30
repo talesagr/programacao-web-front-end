@@ -1,33 +1,54 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CrudTable from '../components/crudTable/CrudTable';
 import CrudForm from '../components/crudForm/CrudForm';
-
-const initialBooks = [
-  { id: 1, titulo: 'Livro A', descricao: 'Descrição A', 'ano-de-publicacao': '2000', genero: 'Ficção', 'quantidade-em-estoque': 10 },
-  { id: 2, titulo: 'Livro B', descricao: 'Descrição B', 'ano-de-publicacao': '2010', genero: 'Drama', 'quantidade-em-estoque': 5 },
-];
+import { getBooks, createBook, updateBook, deleteBook} from '../api'
 
 const Books = () => {
-  const [books, setBooks] = useState(initialBooks);
+  const [books, setBooks] = useState([]);
   const [editingBook, setEditingBook] = useState(null);
+
+
+  useEffect(()=>{
+    fetchBooks()
+  }, [])
+
+  const fetchBooks = async () => {
+    try {
+      const response = await getBooks();
+      setBooks(response.data)
+    } catch (error) {
+      console.error('Erro ao buscar livros:', error)
+    }
+  }
 
   const handleEdit = (id) => {
     const book = books.find((b) => b.id === id);
     setEditingBook(book);
   };
 
-  const handleDelete = (id) => {
-    setBooks(books.filter((b) => b.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await deleteBook(id)
+      setBooks(books.filter((b)=> b.id !== id))
+    } catch (error) {
+        console.error('Erro ao deletar livro', error)
+    }
   };
 
-  const handleSave = (book) => {
-    if (book.id) {
-      setBooks(books.map((b) => (b.id === book.id ? book : b)));
-    } else {
-      book.id = books.length + 1;
-      setBooks([...books, book]);
+  const handleSave = async (book) => {
+    try {
+      if (book.id) {
+        await updateBook(book.id, book);
+        setBooks(books.map((b) => (b.id === book.id ? book : b)));
+      } else {
+        const response = await createBook(book);
+        setBooks([...books, response.data]);
+      }
+      setEditingBook(null);  
+    } catch (error) {
+      console.error('Erro ao salvar livro:', error)
     }
-    setEditingBook(null);
+    
   };
 
   const handleCancel = () => {
