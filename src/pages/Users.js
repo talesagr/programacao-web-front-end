@@ -60,7 +60,7 @@ const Users = () => {
       <h1>Usuários</h1>
       <CrudTable
         data={users}
-        columns={['nome', 'senha', 'isAdmin']}
+        columns={['name', 'password', 'email']}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
