@@ -1,7 +1,10 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: 'localhost:8080/api',
+    baseURL: 'http://127.0.0.1:8080/api',
+    headers : {
+        'Content-Type' : 'application/json'
+    },
 });
 
 export const getUsers = () => api.get('/users');
