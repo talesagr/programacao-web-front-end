@@ -60,13 +60,13 @@ const Users = () => {
       <h1>Usuários</h1>
       <CrudTable
         data={users}
-        columns={['name', 'password', 'email']}
+        columns={['name', 'password', 'email', 'isAdmin']}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
       <h2>{editingUser ? 'Editar Usuário' : 'Adicionar Usuário'}</h2>
       <CrudForm
-        initialData={editingUser || { nome: '', senha: '', isAdmin: false }}
+        initialData={editingUser || { name: '', password: '', email: '', isAdmin: false }}
         onSave={handleSave}
         onCancel={handleCancel}
       />

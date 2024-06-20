@@ -16,7 +16,6 @@ const CrudTable = ({ data, columns, onEdit, onDelete }) => {
           {columns.map((col) => (
             <th key={col}>{col}</th>
           ))}
-          <th>Admin</th>
           <th>Ações</th>
         </tr>
       </thead>
@@ -26,7 +25,6 @@ const CrudTable = ({ data, columns, onEdit, onDelete }) => {
             {columns.map((col) => (
               <td key={col}>{item[col]}</td>
             ))}
-            <td>{renderAdminIcon(item.admin)}</td>
             <td>
               <button onClick={() => onEdit(item.id)}>Editar</button>
               <button onClick={() => onDelete(item.id)}>Excluir</button>
