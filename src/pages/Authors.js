@@ -59,13 +59,13 @@ const Authors = () => {
       <h1>Autores</h1>
       <CrudTable
         data={authors}
-        columns={['nome', 'biografia', 'data-nascimento', 'nacionalidade']}
+        columns={['name', 'bio', 'birthDate', 'nationality']}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
       <h2>{editingAuthor ? 'Editar Autor' : 'Adicionar Autor'}</h2>
       <CrudForm
-        initialData={editingAuthor || { nome: '', biografia: '', 'data-nascimento': '', nacionalidade: '' }}
+        initialData={editingAuthor || { name: '', bio: '', birthDate: '', nationality: '' }}
         onSave={handleSave}
         onCancel={handleCancel}
       />

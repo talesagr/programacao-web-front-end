@@ -14,7 +14,7 @@ export const deleteUser = (id) => api.delete(`/users/${id}`);
 
 export const getBooks = () => api.get('/books');
 export const createBook = (data) => api.post('/books', data);
-export const updateBook = (id, data) => api.get(`/books/${id}`, data);
+export const updateBook = (id, data) => api.put(`/books/${id}`, data);
 export const deleteBook = (id) => api.delete(`/books/${id}`);
 
 export const getAuthors = () => api.get('/authors');

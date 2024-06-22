@@ -60,13 +60,13 @@ const Books = () => {
       <h1>Livros</h1>
       <CrudTable
         data={books}
-        columns={['titulo', 'descricao', 'ano-de-publicacao', 'genero', 'quantidade-em-estoque']}
+        columns={['title', 'description', 'publicationYear', 'genre', 'stockQuantity']}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
       <h2>{editingBook ? 'Editar Livro' : 'Adicionar Livro'}</h2>
       <CrudForm
-        initialData={editingBook || { titulo: '', descricao: '', 'ano-de-publicacao': '', genero: '', 'quantidade-em-estoque': '' }}
+        initialData={editingBook || { title: '', description: '', publicationYear: '', genre: '', stockQuantity: '' }}
         onSave={handleSave}
         onCancel={handleCancel}
       />
