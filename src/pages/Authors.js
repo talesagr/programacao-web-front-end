@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AuthorForm from '../components/author/authorForm';
-import { getAuthors, createAuthor, updateAuthor, deleteAuthor, getBooksByAuthorId } from '../api';
+import { getAuthors, createAuthor, updateAuthor, deleteAuthor, getBooksByAuthorId, addBooksToAuthor } from '../api';
 import { Link } from 'react-router-dom';
 import '../App.css';
 import '../components/crudTable/CrudTable.css';
@@ -21,7 +21,7 @@ const AuthorsPage = () => {
         const booksResponse = await getBooksByAuthorId(author.id);
         return {
           ...author,
-          books: booksResponse.data,
+          books: booksResponse.data || [],
         };
       }));
       setAuthors(authorsWithBooks);
@@ -46,13 +46,18 @@ const AuthorsPage = () => {
 
   const handleSave = async (author) => {
     try {
+      let savedAuthor;
       if (author.id) {
-        await updateAuthor(author.id, author);
-        setAuthors(authors.map((a) => (a.id === author.id ? author : a)));
+        savedAuthor = await updateAuthor(author.id, author);
+        setAuthors(authors.map((a) => (a.id === author.id ? savedAuthor.data : a)));
       } else {
-        const response = await createAuthor(author);
-        setAuthors([...authors, response.data]);
+        savedAuthor = await createAuthor(author);
+        setAuthors([...authors, savedAuthor.data]);
       }
+      if (author.books && author.books.length > 0) {
+        await addBooksToAuthor(savedAuthor.data.id, author.books);
+      }
+      fetchAuthors(); 
       setEditingAuthor(null);
     } catch (error) {
       console.error('Erro ao salvar autor:', error);
@@ -86,7 +91,7 @@ const AuthorsPage = () => {
               <td>{author.nationality}</td>
               <td>
                 {author.books.map((book) => (
-                  <Link key={book.id} to={`/books/${book.id}`}>
+                  <Link key={`${author.id}-${book.id}`} to={`/books/${book.id}`}>
                     {book.title}
                   </Link>
                 ))}

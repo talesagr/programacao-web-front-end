@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import BookForm from '../components/book/bookForm';
 import { getBooks, createBook, updateBook, deleteBook, getAuthorsByBookId } from '../api';
 import { Link } from 'react-router-dom';
+import '../App.css';
+import '../components/crudTable/CrudTable.css';
+import '../components/crudForm/CrudForm.css';
 
 const BooksPage = () => {
   const [books, setBooks] = useState([]);
@@ -18,7 +21,7 @@ const BooksPage = () => {
         const authorsResponse = await getAuthorsByBookId(book.id);
         return {
           ...book,
-          authors: authorsResponse.data,
+          authors: authorsResponse.data || [],
         };
       }));
       setBooks(booksWithAuthors);
@@ -48,7 +51,7 @@ const BooksPage = () => {
         setBooks(books.map((b) => (b.id === book.id ? book : b)));
       } else {
         const response = await createBook(book);
-        setBooks([...books, response.data]);
+        setBooks([...books, { ...response.data, authors: [] }]);
       }
       setEditingBook(null);
     } catch (error) {
@@ -63,7 +66,7 @@ const BooksPage = () => {
   return (
     <div>
       <h1>Livros</h1>
-      <table>
+      <table className="crud-table">
         <thead>
           <tr>
             <th>Título</th>

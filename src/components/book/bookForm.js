@@ -3,7 +3,7 @@ import { getAuthors } from '../../api';
 import '../crudForm/CrudForm.css';
 
 const BookForm = ({ initialData, onSave, onCancel }) => {
-  const [formData, setFormData] = useState(initialData);
+  const [formData, setFormData] = useState({ ...initialData, authors: initialData.authors || [] });
   const [authors, setAuthors] = useState([]);
 
   useEffect(() => {
@@ -23,23 +23,25 @@ const BookForm = ({ initialData, onSave, onCancel }) => {
     });
   };
 
-  const handleAuthorChange = (e) => {
-    const { options } = e.target;
-    const selectedAuthors = [];
-    for (const option of options) {
-      if (option.selected) {
-        selectedAuthors.push(option.value);
+  const handleAuthorChange = (authorId) => {
+    setFormData((prevState) => {
+      const newAuthors = [...prevState.authors];
+      if (newAuthors.includes(authorId)) {
+        return { ...prevState, authors: newAuthors.filter((id) => id !== authorId) };
+      } else {
+        newAuthors.push(authorId);
+        return { ...prevState, authors: newAuthors };
       }
-    }
-    setFormData({
-      ...formData,
-      authors: selectedAuthors,
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(formData);
+    const adjustedFormData = {
+      ...formData,
+      authors: formData.authors || [] // Garante que authors é uma lista
+    };
+    onSave(adjustedFormData);
   };
 
   return (
@@ -89,16 +91,7 @@ const BookForm = ({ initialData, onSave, onCancel }) => {
           onChange={handleChange}
         />
       </div>
-      <div>
-        <label>Autores</label>
-        <select multiple value={formData.authors} onChange={handleAuthorChange}>
-          {authors.map((author) => (
-            <option key={author.id} value={author.id}>
-              {author.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      
       <div className="button-group">
         <button type="submit">Salvar</button>
         <button type="button" onClick={onCancel}>Cancelar</button>

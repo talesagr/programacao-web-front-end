@@ -4,7 +4,6 @@ import Books from './pages/Books'
 import Authors from './pages/Authors'
 import BookDetail from './components/book/bookDetail.js';
 import AuthorDetail from './components/author/authorDetail';
-import Users from './pages/Users';
 import './App.css';
 
 const App = () => {
@@ -16,7 +15,6 @@ const App = () => {
           <ul>
             <li><Link to="/books">Livros</Link></li>
             <li><Link to="/authors">Autores</Link></li>
-            <li><Link to="/users">Usuários</Link></li>
           </ul>
         </nav>
       </header>
@@ -26,7 +24,6 @@ const App = () => {
           <Route path="/authors/:id" element={<AuthorDetail />} />
           <Route path="/books" element={<Books />} />
           <Route path="/authors" element={<Authors />} />
-          <Route path="/users" element={<Users />} />
         </Routes>
       </main>
     </div>
