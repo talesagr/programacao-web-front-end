@@ -1,37 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import CrudTable from '../components/crudTable/CrudTable';
-import CrudForm from '../components/crudForm/CrudForm';
-import {getAuthors, createAuthor, updateAuthor, deleteAuthor } from '../api'
+import AuthorForm from '../components/author/authorForm';
+import { getAuthors, createAuthor, updateAuthor, deleteAuthor, getBooksByAuthorId } from '../api';
+import { Link } from 'react-router-dom';
+import '../App.css';
+import '../components/crudTable/CrudTable.css';
+import '../components/crudForm/CrudForm.css';
 
-const Authors = () => {
+const AuthorsPage = () => {
   const [authors, setAuthors] = useState([]);
   const [editingAuthor, setEditingAuthor] = useState(null);
 
-  
-  useEffect(()=>{
+  useEffect(() => {
     fetchAuthors();
-  }, [])
+  }, []);
 
   const fetchAuthors = async () => {
     try {
-      const response = await getAuthors()
-      setAuthors(response.data.map(author => ({
-        ...author,
-        birthDate: formatDateToDisplay(author.birthDate)
-      })))
+      const response = await getAuthors();
+      const authorsWithBooks = await Promise.all(response.data.map(async (author) => {
+        const booksResponse = await getBooksByAuthorId(author.id);
+        return {
+          ...author,
+          books: booksResponse.data,
+        };
+      }));
+      setAuthors(authorsWithBooks);
     } catch (error) {
-      console.error('Erro ao buscar autores:',error)
+      console.error('Erro ao buscar autores:', error);
     }
-  }
-
-  const formatDateToDisplay = (dateString) => {
-    const [year, month, day] = dateString.split('-');
-    return `${day}-${month}-${year}`
-  }
-
-  const formatDateToSave = (dateString) => {
-    const [day, month, year] = dateString.match(/(\d{2})-(\d{2})-(\d{4})/).slice(1);
-    return `${year}-${month}-${day}`;
   };
 
   const handleEdit = (id) => {
@@ -41,27 +37,25 @@ const Authors = () => {
 
   const handleDelete = async (id) => {
     try {
-      await deleteAuthor(id)
-      setAuthors(authors.filter((a) => a.id !== id)); 
+      await deleteAuthor(id);
+      setAuthors(authors.filter((a) => a.id !== id));
     } catch (error) {
-      console.error('Erro ao deletar autor:', error)
+      console.error('Erro ao deletar autor:', error);
     }
   };
 
   const handleSave = async (author) => {
     try {
-        author.birthDate = formatDateToSave(author.birthDate)
-
       if (author.id) {
-        await updateAuthor(author.id, author)
+        await updateAuthor(author.id, author);
         setAuthors(authors.map((a) => (a.id === author.id ? author : a)));
       } else {
-        const response = await createAuthor(author)
+        const response = await createAuthor(author);
         setAuthors([...authors, response.data]);
       }
       setEditingAuthor(null);
     } catch (error) {
-      console.error('Erro ao salvar autor:', error)
+      console.error('Erro ao salvar autor:', error);
     }
   };
 
@@ -72,15 +66,42 @@ const Authors = () => {
   return (
     <div>
       <h1>Autores</h1>
-      <CrudTable
-        data={authors}
-        columns={['name', 'bio', 'birthDate', 'nationality']}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Biografia</th>
+            <th>Data de Nascimento</th>
+            <th>Nacionalidade</th>
+            <th>Livros</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {authors.map((author) => (
+            <tr key={author.id}>
+              <td>{author.name}</td>
+              <td>{author.bio}</td>
+              <td>{author.birthDate}</td>
+              <td>{author.nationality}</td>
+              <td>
+                {author.books.map((book) => (
+                  <Link key={book.id} to={`/books/${book.id}`}>
+                    {book.title}
+                  </Link>
+                ))}
+              </td>
+              <td>
+                <button onClick={() => handleEdit(author.id)}>Editar</button>
+                <button onClick={() => handleDelete(author.id)}>Excluir</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <h2>{editingAuthor ? 'Editar Autor' : 'Adicionar Autor'}</h2>
-      <CrudForm
-        initialData={editingAuthor || { name: '', bio: '', birthDate: '', nationality: '' }}
+      <AuthorForm
+        initialData={editingAuthor || { name: '', bio: '', birthDate: '', nationality: '', books: [] }}
         onSave={handleSave}
         onCancel={handleCancel}
       />
@@ -88,4 +109,4 @@ const Authors = () => {
   );
 };
 
-export default Authors;
+export default AuthorsPage;

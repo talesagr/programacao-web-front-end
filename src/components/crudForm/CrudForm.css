@@ -27,7 +27,9 @@ label {
 }
 
 input[type="text"],
-input[type="checkbox"] {
+input[type="number"],
+input[type="checkbox"],
+select {
   width: 100%;
   max-width: 480px;
   padding: 8px;
@@ -38,6 +40,12 @@ input[type="checkbox"] {
 
 input[type="checkbox"] {
   width: auto;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
 
 button {
@@ -54,10 +62,4 @@ button {
 
 button:hover {
   background-color: #003366; 
-}
-
-.button-group {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
 }

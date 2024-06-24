@@ -1,25 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import CrudTable from '../components/crudTable/CrudTable';
-import CrudForm from '../components/crudForm/CrudForm';
-import { getBooks, createBook, updateBook, deleteBook} from '../api'
+import BookForm from '../components/book/bookForm';
+import { getBooks, createBook, updateBook, deleteBook, getAuthorsByBookId } from '../api';
+import { Link } from 'react-router-dom';
 
-const Books = () => {
+const BooksPage = () => {
   const [books, setBooks] = useState([]);
   const [editingBook, setEditingBook] = useState(null);
 
-
-  useEffect(()=>{
-    fetchBooks()
-  }, [])
+  useEffect(() => {
+    fetchBooks();
+  }, []);
 
   const fetchBooks = async () => {
     try {
       const response = await getBooks();
-      setBooks(response.data)
+      const booksWithAuthors = await Promise.all(response.data.map(async (book) => {
+        const authorsResponse = await getAuthorsByBookId(book.id);
+        return {
+          ...book,
+          authors: authorsResponse.data,
+        };
+      }));
+      setBooks(booksWithAuthors);
     } catch (error) {
-      console.error('Erro ao buscar livros:', error)
+      console.error('Erro ao buscar livros:', error);
     }
-  }
+  };
 
   const handleEdit = (id) => {
     const book = books.find((b) => b.id === id);
@@ -28,10 +34,10 @@ const Books = () => {
 
   const handleDelete = async (id) => {
     try {
-      await deleteBook(id)
-      setBooks(books.filter((b)=> b.id !== id))
+      await deleteBook(id);
+      setBooks(books.filter((b) => b.id !== id));
     } catch (error) {
-        console.error('Erro ao deletar livro', error)
+      console.error('Erro ao deletar livro:', error);
     }
   };
 
@@ -44,11 +50,10 @@ const Books = () => {
         const response = await createBook(book);
         setBooks([...books, response.data]);
       }
-      setEditingBook(null);  
+      setEditingBook(null);
     } catch (error) {
-      console.error('Erro ao salvar livro:', error)
+      console.error('Erro ao salvar livro:', error);
     }
-    
   };
 
   const handleCancel = () => {
@@ -58,15 +63,44 @@ const Books = () => {
   return (
     <div>
       <h1>Livros</h1>
-      <CrudTable
-        data={books}
-        columns={['title', 'description', 'publicationYear', 'genre', 'stockQuantity']}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      <table>
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Descrição</th>
+            <th>Ano de Publicação</th>
+            <th>Gênero</th>
+            <th>Quantidade em Estoque</th>
+            <th>Autores</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {books.map((book) => (
+            <tr key={book.id}>
+              <td>{book.title}</td>
+              <td>{book.description}</td>
+              <td>{book.publicationYear}</td>
+              <td>{book.genre}</td>
+              <td>{book.stockQuantity}</td>
+              <td>
+                {book.authors.map((author) => (
+                  <Link key={author.id} to={`/authors/${author.id}`}>
+                    {author.name}
+                  </Link>
+                ))}
+              </td>
+              <td>
+                <button onClick={() => handleEdit(book.id)}>Editar</button>
+                <button onClick={() => handleDelete(book.id)}>Excluir</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <h2>{editingBook ? 'Editar Livro' : 'Adicionar Livro'}</h2>
-      <CrudForm
-        initialData={editingBook || { title: '', description: '', publicationYear: '', genre: '', stockQuantity: '' }}
+      <BookForm
+        initialData={editingBook || { title: '', description: '', publicationYear: '', genre: '', stockQuantity: '', authors: [] }}
         onSave={handleSave}
         onCancel={handleCancel}
       />
@@ -74,4 +108,4 @@ const Books = () => {
   );
 };
 
-export default Books;
+export default BooksPage;
