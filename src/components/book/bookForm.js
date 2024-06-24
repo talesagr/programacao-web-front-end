@@ -39,12 +39,16 @@ const BookForm = ({ initialData, onSave, onCancel }) => {
     });
   };
 
+  const prepareDataForSave = (data) => {
+    return {
+      ...data,
+      authors: data.authors.map((author) => author.id || author)
+    };
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const adjustedFormData = {
-      ...formData,
-      authors: formData.authors || [] 
-    };
+    const adjustedFormData = prepareDataForSave(formData);
     onSave(adjustedFormData);
   };
 

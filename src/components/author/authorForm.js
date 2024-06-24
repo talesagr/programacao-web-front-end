@@ -47,12 +47,17 @@ const AuthorForm = ({ initialData, onSave, onCancel }) => {
     return isValidDate && day > 0 && day <= new Date(year, month, 0).getDate();
   };
 
+  const prepareDataForSave = (data) => {
+    return {
+      ...data,
+      books: data.books.map((book) => book.id || book),
+      birthDate: data.birthDate.split('-').reverse().join('-')
+    };
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const adjustedFormData = {
-      ...formData,
-      birthDate: formData.birthDate.split('-').reverse().join('-') || []
-    };
+    const adjustedFormData = prepareDataForSave(formData);
 
     if (!validateDate(adjustedFormData.birthDate)) {
       setErrors({ birthDate: 'Data inválida' });
