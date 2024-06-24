@@ -6,6 +6,7 @@ import '../crudForm/CrudForm.css';
 const AuthorForm = ({ initialData, onSave, onCancel }) => {
   const [formData, setFormData] = useState({ ...initialData, books: initialData.books || [] });
   const [books, setBooks] = useState([]);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -24,25 +25,38 @@ const AuthorForm = ({ initialData, onSave, onCancel }) => {
     });
   };
 
-  const handleBookChange = (bookId) => {
-    setFormData((prevState) => {
-      const newBooks = [...prevState.books];
-      if (newBooks.includes(bookId)) {
-        return { ...prevState, books: newBooks.filter((id) => id !== bookId) };
-      } else {
-        newBooks.push(bookId);
-        return { ...prevState, books: newBooks };
+  const handleBookChange = (e) => {
+    const { options } = e.target;
+    const selectedBooks = [];
+    for (const option of options) {
+      if (option.selected) {
+        selectedBooks.push(option.value);
       }
+    }
+    setFormData({
+      ...formData,
+      books: selectedBooks,
     });
+  };
+
+  const validateDate = (date) => {
+    const [year, month, day] = date.split('-').map(Number);
+    const isValidDate = !isNaN(new Date(year, month - 1, day).getTime());
+    return isValidDate && day > 0 && day <= new Date(year, month, 0).getDate();
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const adjustedFormData = {
       ...formData,
-      birthDate: formData.birthDate.split('-').reverse().join('-'), // Converte de dd-MM-yyyy para yyyy-MM-dd
-      books: formData.books || [] // Garante que books é uma lista
+      birthDate: formData.birthDate.split('-').reverse().join('-') // Converte de dd-MM-yyyy para yyyy-MM-dd
     };
+
+    if (!validateDate(adjustedFormData.birthDate)) {
+      setErrors({ birthDate: 'Data inválida' });
+      return;
+    }
+
     onSave(adjustedFormData);
   };
 
@@ -76,6 +90,7 @@ const AuthorForm = ({ initialData, onSave, onCancel }) => {
         >
           {(inputProps) => <input {...inputProps} type="text" />}
         </InputMask>
+        {errors.birthDate && <span className="error">{errors.birthDate}</span>}
       </div>
       <div>
         <label>Nacionalidade</label>
