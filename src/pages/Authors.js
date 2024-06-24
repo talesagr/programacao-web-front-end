@@ -66,7 +66,7 @@ const AuthorsPage = () => {
   return (
     <div>
       <h1>Autores</h1>
-      <table>
+      <table className="crud-table">
         <thead>
           <tr>
             <th>Nome</th>

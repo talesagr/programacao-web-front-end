@@ -4,7 +4,7 @@ import { getBooks } from '../../api';
 import '../crudForm/CrudForm.css';
 
 const AuthorForm = ({ initialData, onSave, onCancel }) => {
-  const [formData, setFormData] = useState(initialData);
+  const [formData, setFormData] = useState({ ...initialData, books: initialData.books || [] });
   const [books, setBooks] = useState([]);
 
   useEffect(() => {
@@ -24,23 +24,26 @@ const AuthorForm = ({ initialData, onSave, onCancel }) => {
     });
   };
 
-  const handleBookChange = (e) => {
-    const { options } = e.target;
-    const selectedBooks = [];
-    for (const option of options) {
-      if (option.selected) {
-        selectedBooks.push(option.value);
+  const handleBookChange = (bookId) => {
+    setFormData((prevState) => {
+      const newBooks = [...prevState.books];
+      if (newBooks.includes(bookId)) {
+        return { ...prevState, books: newBooks.filter((id) => id !== bookId) };
+      } else {
+        newBooks.push(bookId);
+        return { ...prevState, books: newBooks };
       }
-    }
-    setFormData({
-      ...formData,
-      books: selectedBooks,
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(formData);
+    const adjustedFormData = {
+      ...formData,
+      birthDate: formData.birthDate.split('-').reverse().join('-'), // Converte de dd-MM-yyyy para yyyy-MM-dd
+      books: formData.books || [] // Garante que books é uma lista
+    };
+    onSave(adjustedFormData);
   };
 
   return (
@@ -85,13 +88,21 @@ const AuthorForm = ({ initialData, onSave, onCancel }) => {
       </div>
       <div>
         <label>Livros</label>
-        <select multiple value={formData.books} onChange={handleBookChange}>
+        <div className="books-list">
           {books.map((book) => (
-            <option key={book.id} value={book.id}>
-              {book.title}
-            </option>
+            <div key={book.id} className="book-item">
+              <label>
+                <input
+                  type="checkbox"
+                  value={book.id}
+                  checked={formData.books.includes(book.id)}
+                  onChange={() => handleBookChange(book.id)}
+                />
+                {book.title}
+              </label>
+            </div>
           ))}
-        </select>
+        </div>
       </div>
       <div className="button-group">
         <button type="submit">Salvar</button>

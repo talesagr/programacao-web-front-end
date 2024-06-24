@@ -1,4 +1,4 @@
-/* src/components/CrudForm.css */
+/* src/components/crudForm/CrudForm.css */
 
 form {
   display: flex;
@@ -40,6 +40,19 @@ select {
 
 input[type="checkbox"] {
   width: auto;
+}
+
+.books-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.book-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .button-group {
