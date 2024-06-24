@@ -7,6 +7,10 @@ const BookForm = ({ initialData, onSave, onCancel }) => {
   const [authors, setAuthors] = useState([]);
 
   useEffect(() => {
+    setFormData({ ...initialData, authors: initialData.authors || [] });
+  }, [initialData]);
+
+  useEffect(() => {
     const fetchAuthors = async () => {
       const response = await getAuthors();
       setAuthors(response.data);
@@ -39,7 +43,7 @@ const BookForm = ({ initialData, onSave, onCancel }) => {
     e.preventDefault();
     const adjustedFormData = {
       ...formData,
-      authors: formData.authors || [] // Garante que authors é uma lista
+      authors: formData.authors || [] 
     };
     onSave(adjustedFormData);
   };
@@ -91,7 +95,22 @@ const BookForm = ({ initialData, onSave, onCancel }) => {
           onChange={handleChange}
         />
       </div>
-      
+      <div>
+        <label>Autores</label>
+        {authors.map((author) => (
+          <div key={author.id}>
+            <label>
+              <input
+                type="checkbox"
+                value={author.id}
+                checked={formData.authors.includes(author.id)}
+                onChange={() => handleAuthorChange(author.id)}
+              />
+              {author.name}
+            </label>
+          </div>
+        ))}
+      </div>
       <div className="button-group">
         <button type="submit">Salvar</button>
         <button type="button" onClick={onCancel}>Cancelar</button>

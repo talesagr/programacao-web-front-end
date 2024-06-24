@@ -9,6 +9,10 @@ const AuthorForm = ({ initialData, onSave, onCancel }) => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
+    setFormData({ ...initialData, books: initialData.books || [] });
+  }, [initialData]);
+
+  useEffect(() => {
     const fetchBooks = async () => {
       const response = await getBooks();
       setBooks(response.data);
@@ -25,17 +29,15 @@ const AuthorForm = ({ initialData, onSave, onCancel }) => {
     });
   };
 
-  const handleBookChange = (e) => {
-    const { options } = e.target;
-    const selectedBooks = [];
-    for (const option of options) {
-      if (option.selected) {
-        selectedBooks.push(option.value);
+  const handleBookChange = (bookId) => {
+    setFormData((prevState) => {
+      const newBooks = [...prevState.books];
+      if (newBooks.includes(bookId)) {
+        return { ...prevState, books: newBooks.filter((id) => id !== bookId) };
+      } else {
+        newBooks.push(bookId);
+        return { ...prevState, books: newBooks };
       }
-    }
-    setFormData({
-      ...formData,
-      books: selectedBooks,
     });
   };
 
@@ -49,7 +51,7 @@ const AuthorForm = ({ initialData, onSave, onCancel }) => {
     e.preventDefault();
     const adjustedFormData = {
       ...formData,
-      birthDate: formData.birthDate.split('-').reverse().join('-') // Converte de dd-MM-yyyy para yyyy-MM-dd
+      birthDate: formData.birthDate.split('-').reverse().join('-') || []
     };
 
     if (!validateDate(adjustedFormData.birthDate)) {
